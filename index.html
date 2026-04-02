@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EcoLoop ISEP-5 | Intelligent Supplier Economic Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-
+ 
 <!-- Firebase SDKs -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
+ 
   const firebaseConfig = {
     apiKey: "AIzaSyDt0Ov08xaYN69xU1sDOObaHy8bJGvqt_g",
     authDomain: "ecoloop-67fce.firebaseapp.com",
@@ -20,10 +20,10 @@
     messagingSenderId: "50320708460",
     appId: "1:50320708460:web:3f2b6d2ea475250b83d949"
   };
-
+ 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
-
+ 
   // Save Industry Verification → Firebase: industries/[GSTIN]
   window.saveIndustryVerification = async function() {
     const tin = document.getElementById('tin').value.trim();
@@ -42,7 +42,7 @@
       setTimeout(() => goTo('page-waste-upload'), 800);
     } catch(e) { showToast('❌ ' + e.message); }
   };
-
+ 
   // Save Waste Listing → Firebase: wasteListing/[auto-id]
   window.saveWasteListing = async function() {
     const qty = document.getElementById('quantity').value.trim();
@@ -71,7 +71,7 @@
       setTimeout(() => goTo('page-waste-analysis'), 800);
     } catch(e) { showToast('❌ ' + e.message); }
   };
-
+ 
   // Save Analysis → Firebase: wasteAnalysis/[auto-id]
   window.saveAnalysis = async function() {
     try {
@@ -90,7 +90,7 @@
       setTimeout(() => goTo('page-industry-dashboard'), 800);
     } catch(e) { showToast('❌ ' + e.message); }
   };
-
+ 
   // Save Buyer → Firebase: buyers/[email]
   window.saveBuyer = async function() {
     const name = document.getElementById('buyerName').value.trim();
@@ -117,7 +117,7 @@
       setTimeout(() => goTo('page-buyer-dashboard'), 800);
     } catch(e) { showToast('❌ ' + e.message); }
   };
-
+ 
   // Save Negotiation Message → Firebase: negotiations/[auto-id]
   window.saveNegoMessage = async function(sender, message, company, material) {
     try {
@@ -128,7 +128,7 @@
       });
     } catch(e) { console.warn('Nego save:', e.message); }
   };
-
+ 
   // Load listing count from DB
   onValue(ref(db, 'wasteListing'), (snap) => {
     const data = snap.val();
@@ -136,7 +136,7 @@
     if (el && data) el.textContent = Object.keys(data).length + ' MATCHES';
   });
 </script>
-
+ 
 <style>
   :root {
     --bg:#0a0f0a;--surface:#111811;--surface2:#172017;--border:#2a3d2a;
@@ -148,7 +148,7 @@
   .page{display:none;min-height:100vh;}
   .page.active{display:flex;flex-direction:column;animation:fadeIn .4s ease;}
   @keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-
+ 
   #page-hero{background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(74,222,128,.12) 0%,transparent 70%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(245,158,11,.06) 0%,transparent 60%),var(--bg);align-items:center;justify-content:center;text-align:center;padding:60px 24px;position:relative;overflow:hidden;}
   .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(74,222,128,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(74,222,128,.04) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;}
   .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:999px;padding:6px 18px;font-size:.72rem;font-family:'JetBrains Mono',monospace;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:32px;}
@@ -163,12 +163,12 @@
   .stat-label{font-size:.72rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:4px;}
   .db-status{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--accent);background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:999px;padding:4px 12px;margin-top:14px;}
   .db-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
-
+ 
   .btn-primary{display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:#0a0f0a;border:none;border-radius:6px;padding:16px 40px;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
   .btn-primary:hover{background:var(--accent2);transform:translateY(-2px);box-shadow:0 12px 40px rgba(74,222,128,.3);}
   .btn-secondary{display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid var(--border);border-radius:6px;padding:13px 28px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;}
   .btn-secondary:hover{border-color:var(--muted);color:var(--text);}
-
+ 
   #page-role{align-items:center;justify-content:center;padding:60px 24px;background:var(--bg);}
   .role-cards{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;margin-top:48px;}
   .role-card{width:280px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px 32px;cursor:pointer;transition:all .3s;text-align:center;position:relative;overflow:hidden;}
@@ -177,7 +177,7 @@
   .role-icon{font-size:52px;margin-bottom:20px;display:block;}
   .role-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.06em;color:var(--accent);margin-bottom:8px;}
   .role-desc{font-size:.85rem;color:var(--muted);line-height:1.6;}
-
+ 
   .form-page{max-width:720px;margin:0 auto;padding:60px 24px;width:100%;}
   .page-header{margin-bottom:40px;}
   .step-tag{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--accent);letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
@@ -195,7 +195,7 @@
   .btn-row{display:flex;gap:12px;justify-content:space-between;margin-top:32px;flex-wrap:wrap;}
   .divider{height:1px;background:var(--border);margin:32px 0;}
   .info-box{background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.15);border-radius:10px;padding:16px 20px;font-size:.85rem;color:var(--label);margin-bottom:24px;display:flex;align-items:flex-start;gap:10px;}
-
+ 
   .upload-box{border:2px dashed var(--border);border-radius:12px;padding:48px 24px;text-align:center;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;background:var(--surface);}
   .upload-box:hover{border-color:var(--accent);background:rgba(74,222,128,.03);}
   .upload-box input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
@@ -206,7 +206,7 @@
   .waste-types{display:flex;flex-wrap:wrap;gap:8px;}
   .waste-chip{padding:8px 16px;border:1px solid var(--border);border-radius:999px;font-size:.82rem;cursor:pointer;transition:all .2s;background:var(--surface);}
   .waste-chip:hover,.waste-chip.active{border-color:var(--accent);color:var(--accent);background:rgba(74,222,128,.08);}
-
+ 
   .analysis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px;}
   @media(max-width:520px){.analysis-grid{grid-template-columns:1fr;}}
   .analysis-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;}
@@ -220,7 +220,7 @@
   .env-risk-label{font-size:.8rem;color:var(--label);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;font-weight:600;}
   .risk-bar-wrap{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;}
   .risk-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--amber),var(--red));transition:width .5s ease;}
-
+ 
   .top-nav{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--border);background:rgba(10,15,10,.8);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;}
   .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;color:var(--accent);}
   .nav-logo span{color:var(--muted);font-size:11px;font-family:'JetBrains Mono',monospace;display:block;letter-spacing:.12em;}
@@ -228,7 +228,7 @@
   .nav-back:hover{border-color:var(--accent);color:var(--accent);}
   .progress-bar{height:2px;background:var(--surface2);}
   .progress-fill{height:100%;background:var(--accent);transition:width .4s ease;}
-
+ 
   .dashboard-layout{display:grid;grid-template-columns:300px 1fr;gap:24px;padding:32px 24px;max-width:1200px;margin:0 auto;width:100%;}
   @media(max-width:768px){.dashboard-layout{grid-template-columns:1fr;}}
   .panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
@@ -253,7 +253,7 @@
   .nego-input-row input{flex:1;border-radius:999px;padding:10px 18px;}
   .send-btn{background:var(--accent);color:#0a0f0a;border:none;border-radius:999px;width:40px;height:40px;font-size:16px;cursor:pointer;transition:all .2s;flex-shrink:0;}
   .send-btn:hover{background:var(--accent2);}
-
+ 
   .ind-dash{max-width:1100px;margin:0 auto;padding:32px 24px;width:100%;}
   .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
   @media(max-width:700px){.kpi-row{grid-template-columns:repeat(2,1fr);}}
@@ -262,4 +262,348 @@
   .kpi-value{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--accent);line-height:1;}
   .kpi-sub{font-size:.75rem;color:var(--muted);margin-top:4px;}
   .data-table{width:100%;border-collapse:collapse;}
-  .data-table th{text-align:left;font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:10px 14px;border-bott
+  .data-table th{text-align:left;font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:10px 14px;border-bottom:1px solid var(--border);}
+  .data-table td{padding:14px;border-bottom:1px solid rgba(42,61,42,.5);font-size:.9rem;}
+  .data-table tr:last-child td{border-bottom:none;}
+  .status-badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;}
+  .status-badge.active{background:rgba(74,222,128,.12);color:var(--accent);border:1px solid rgba(74,222,128,.25);}
+  .status-badge.pending{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.25);}
+  .status-badge.sold{background:rgba(96,165,250,.12);color:var(--blue);border:1px solid rgba(96,165,250,.25);}
+  .rel-graph{background:var(--surface2);border-radius:12px;padding:24px;text-align:center;position:relative;min-height:260px;display:flex;align-items:center;justify-content:center;}
+  .rel-center{background:rgba(74,222,128,.12);border:2px solid var(--accent);border-radius:12px;padding:16px 24px;font-weight:700;color:var(--accent);font-size:.9rem;position:relative;z-index:2;}
+  .rel-node{position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:.78rem;color:var(--label);transition:all .2s;cursor:pointer;}
+  .rel-node:hover{border-color:var(--accent);color:var(--accent);}
+  .rel-node.n1{top:20px;left:20px;}.rel-node.n2{top:20px;right:20px;}.rel-node.n3{bottom:20px;left:20px;}.rel-node.n4{bottom:20px;right:20px;}.rel-node.n5{top:50%;left:20px;transform:translateY(-50%);}.rel-node.n6{top:50%;right:20px;transform:translateY(-50%);}
+ 
+  ::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--surface2);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:14px 20px;font-size:.875rem;color:var(--text);transform:translateY(80px);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1);z-index:9999;max-width:320px;}
+  .toast.show{transform:translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+ 
+<!-- PAGE 1: HERO -->
+<div id="page-hero" class="page active">
+  <div class="hero-grid"></div>
+  <div style="position:relative;z-index:1;width:100%;max-width:800px;margin:0 auto;">
+    <div class="hero-badge"><span></span> ISEP-5 Industrial Optimization Platform</div>
+    <h1 class="hero-title">ECOLOOP</h1>
+    <p class="hero-subtitle">Intelligent Supplier Economic Platform · 5th Industrial</p>
+    <p class="hero-slogan"><strong>Close the loop.</strong> Transform industrial waste into circular opportunity — connecting suppliers and buyers through intelligent, geo-tagged, AI-powered trade.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">12K+</div><div class="stat-label">Tonnes Redirected</div></div>
+      <div class="stat"><div class="stat-num">840</div><div class="stat-label">Industries Connected</div></div>
+      <div class="stat"><div class="stat-num">₹9.2Cr</div><div class="stat-label">Value Recovered</div></div>
+      <div class="stat"><div class="stat-num">68%</div><div class="stat-label">CO₂ Reduced</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+      <button class="btn-primary" onclick="goTo('page-role')">Enter Platform ›</button>
+      <div class="db-status"><div class="db-dot"></div> Firebase Live · ecoloop-67fce</div>
+    </div>
+  </div>
+</div>
+ 
+<!-- PAGE 2: ROLE -->
+<div id="page-role" class="page">
+  <nav class="top-nav"><div class="nav-logo">ECOLOOP <span>ISEP-5 PLATFORM</span></div><button class="nav-back" onclick="goTo('page-hero')">← Back</button></nav>
+  <div class="progress-bar"><div class="progress-fill" style="width:10%"></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;text-align:center;">
+    <div class="step-tag" style="justify-content:center;">Step 01 — Role</div>
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:.04em;margin-bottom:12px;">Select Your Role</h2>
+    <p style="color:var(--muted);max-width:480px;">Are you listing industrial waste, or sourcing recycled materials?</p>
+    <div class="role-cards">
+      <div class="role-card" onclick="selectRole('industry',this)"><span class="role-icon">🏭</span><div class="role-title">Industry / Seller</div><div class="role-desc">List your industrial waste with geo-tagged images. Set pricing and connect with verified buyers.</div></div>
+      <div class="role-card" onclick="selectRole('buyer',this)"><span class="role-icon">🤝</span><div class="role-title">Buyer / Sourcer</div><div class="role-desc">Browse waste materials, negotiate pricing, and track your sourcing relationships.</div></div>
+    </div>
+  </div>
+</div>
+ 
+<!-- PAGE 3: INDUSTRY VERIFY -->
+<div id="page-industry-verify" class="page">
+  <nav class="top-nav"><div class="nav-logo">ECOLOOP <span>ISEP-5 PLATFORM</span></div><button class="nav-back" onclick="goTo('page-role')">← Back</button></nav>
+  <div class="progress-bar"><div class="progress-fill" style="width:25%"></div></div>
+  <div class="form-page">
+    <div class="page-header">
+      <div class="step-tag">Step 02 — Industry Verification</div>
+      <h2 class="page-title">Verify Your Industry</h2>
+      <p class="page-sub">Saved to Firebase → <code style="color:var(--accent);font-size:.8rem;">industries/[GSTIN]</code></p>
+    </div>
+    <div class="info-box"><span>🔥</span><span>Data saves live to your Firebase Realtime Database on clicking Verify.</span></div>
+    <div class="form-row">
+      <div class="form-group"><label>TIN / TINEM Number <span class="req">*</span></label><input type="text" id="tin" placeholder="33-987654321-001"></div>
+      <div class="form-group"><label>GST Registration Number <span class="req">*</span></label><input type="text" id="gst" placeholder="33AABCU9603R1ZJ"></div>
+    </div>
+    <div class="form-group"><label>Industry / Company Name <span class="req">*</span></label><input type="text" id="companyName" placeholder="Sri Murugan Metal Industries Pvt Ltd"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Industry Sector <span class="req">*</span></label>
+        <select id="sector"><option value="">Select sector</option><option>Textile &amp; Garments</option><option>Chemical Processing</option><option>Metal Fabrication</option><option>Plastics &amp; Polymers</option><option>Paper &amp; Pulp</option><option>Electronics / E-Waste</option><option>Food Processing</option><option>Automotive</option><option>Construction</option><option>Other</option></select>
+      </div>
+      <div class="form-group"><label>State / Region <span class="req">*</span></label>
+        <select id="state"><option value="">Select state</option><option>Tamil Nadu</option><option>Maharashtra</option><option>Gujarat</option><option>Karnataka</option><option>Telangana</option><option>West Bengal</option><option>Rajasthan</option><option>Other</option></select>
+      </div>
+    </div>
+    <div class="form-group"><label>Authorized Contact Person <span class="req">*</span></label><input type="text" id="contactPerson" placeholder="Rajesh Kumar"></div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goTo('page-role')">← Back</button>
+      <button class="btn-primary" onclick="saveIndustryVerification()">🔥 Verify &amp; Save to Firebase →</button>
+    </div>
+  </div>
+</div>
+ 
+<!-- PAGE 4: WASTE UPLOAD -->
+<div id="page-waste-upload" class="page">
+  <nav class="top-nav"><div class="nav-logo">ECOLOOP <span>ISEP-5 PLATFORM</span></div><button class="nav-back" onclick="goTo('page-industry-verify')">← Back</button></nav>
+  <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+  <div class="form-page">
+    <div class="page-header">
+      <div class="step-tag">Step 03 — Waste Listing</div>
+      <h2 class="page-title">List Your Waste</h2>
+      <p class="page-sub">Saved to Firebase → <code style="color:var(--accent);font-size:.8rem;">wasteListing/[auto-id]</code></p>
+    </div>
+    <div class="form-group">
+      <label>Geo-Tagged Waste Photo <span class="req">*</span></label>
+      <div class="upload-box"><input type="file" accept="image/*" onchange="handleImageUpload(event)"><div class="upload-icon">📷</div><div class="upload-title">Tap or drag to upload image</div><div class="upload-hint">JPG, PNG · GPS &amp; timestamp auto-captured</div></div>
+      <div id="uploadPreview" class="upload-preview"><img id="previewImg" src="" alt="Preview"></div>
+      <div id="geoBadge" class="geo-badge" style="display:none;">📍 <span id="geoText">Fetching…</span> &nbsp;|&nbsp; 🕐 <span id="geoTime"></span></div>
+    </div>
+    <div class="form-group">
+      <label>Waste Type <span class="req">*</span></label>
+      <div class="waste-types">
+        <div class="waste-chip" onclick="toggleChip(this)">Metal Scrap</div><div class="waste-chip" onclick="toggleChip(this)">Plastic Waste</div>
+        <div class="waste-chip" onclick="toggleChip(this)">Chemical Sludge</div><div class="waste-chip" onclick="toggleChip(this)">Textile Off-cuts</div>
+        <div class="waste-chip" onclick="toggleChip(this)">Paper / Cardboard</div><div class="waste-chip" onclick="toggleChip(this)">Electronic Waste</div>
+        <div class="waste-chip" onclick="toggleChip(this)">Organic Waste</div><div class="waste-chip" onclick="toggleChip(this)">Glass</div>
+        <div class="waste-chip" onclick="toggleChip(this)">Construction Debris</div><div class="waste-chip" onclick="toggleChip(this)">Other</div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Quantity <span class="req">*</span></label><input type="number" id="quantity" placeholder="500"></div>
+      <div class="form-group"><label>Unit <span class="req">*</span></label><select id="unit"><option>Kilograms (kg)</option><option>Metric Tonnes (MT)</option><option>Litres</option><option>Units / Pieces</option><option>Cubic Metres</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Selling Price ₹ <span class="req">*</span></label><input type="number" id="price" placeholder="18500"></div>
+      <div class="form-group"><label>Disposal Method <span class="req">*</span></label><select id="disposal"><option>Sell As-Is</option><option>Processed Before Sale</option><option>Open to Offers</option></select></div>
+    </div>
+    <div class="form-group"><label>Waste Description <span class="req">*</span></label><textarea id="wasteDesc" placeholder="Composition, condition, hazard classification…"></textarea></div>
+    <div class="form-group"><label>Pickup Address</label><input type="text" id="pickupAddr" placeholder="SIDCO Industrial Estate, Coimbatore - 641021"></div>
+    <div class="form-group"><label>Query / Instructions for Buyers</label><textarea id="buyerQuery" placeholder="Pickup schedule, packaging requirements…" style="min-height:80px;"></textarea></div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goTo('page-industry-verify')">← Back</button>
+      <button class="btn-primary" onclick="saveWasteListing()">🔥 Save &amp; Analyse →</button>
+    </div>
+  </div>
+</div>
+ 
+<!-- PAGE 5: ANALYSIS -->
+<div id="page-waste-analysis" class="page">
+  <nav class="top-nav"><div class="nav-logo">ECOLOOP <span>ISEP-5 PLATFORM</span></div><button class="nav-back" onclick="goTo('page-waste-upload')">← Back</button></nav>
+  <div class="progress-bar"><div class="progress-fill" style="width:70%"></div></div>
+  <div class="form-page">
+    <div class="page-header">
+      <div class="step-tag">Step 04 — Circular Analysis</div>
+      <h2 class="page-title">Waste Analysis</h2>
+      <p class="page-sub">Saved to Firebase → <code style="color:var(--accent);font-size:.8rem;">wasteAnalysis/[auto-id]</code></p>
+    </div>
+    <label style="display:block;margin-bottom:12px;">Circular Pathway Recommendation</label>
+    <div class="analysis-grid">
+      <div class="analysis-card green"><div class="analysis-pct" id="pctRecycle">62%</div><div class="analysis-label">♻️ Recycle</div><div class="analysis-bar"></div></div>
+      <div class="analysis-card amber"><div class="analysis-pct" id="pctReuse">28%</div><div class="analysis-label">🔄 Reuse</div><div class="analysis-bar"></div></div>
+      <div class="analysis-card red"><div class="analysis-pct" id="pctDemolish">10%</div><div class="analysis-label">⚠️ Demolish</div><div class="analysis-bar"></div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="form-group"><label>How This Material Can Be Recycled</label><textarea id="recycleMethod" style="min-height:90px;">Plastic waste can be sorted by polymer type (PET, HDPE, LDPE), cleaned, shredded into flakes, and fed into extrusion equipment to produce pellets for remanufacturing.</textarea></div>
+    <div class="form-group"><label>How This Material Can Be Reused</label><textarea id="reuseMethod" style="min-height:90px;">Containers and off-cuts can be directly resold to secondary manufacturers for storage use, construction form linings, or agricultural packaging without reprocessing.</textarea></div>
+    <div class="form-group">
+      <label>Environmental Pollution Risk</label>
+      <div class="env-risk">
+        <div class="env-risk-label">Pollution Impact Index</div>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div class="risk-bar-wrap" style="flex:1;"><div class="risk-bar-fill" id="riskBar" style="width:35%"></div></div>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--amber);" id="riskPct">35%</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-top:6px;"><span>Low Risk</span><span>Moderate</span><span>High Risk</span></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goTo('page-waste-upload')">← Back</button>
+      <button class="btn-primary" onclick="saveAnalysis()">🔥 Submit to Firebase →</button>
+    </div>
+  </div>
+</div>
+ 
+<!-- PAGE 6: BUYER REGISTER -->
+<div id="page-buyer-register" class="page">
+  <nav class="top-nav"><div class="nav-logo">ECOLOOP <span>ISEP-5 PLATFORM</span></div><button class="nav-back" onclick="goTo('page-role')">← Back</button></nav>
+  <div class="progress-bar"><div class="progress-fill" style="width:33%"></div></div>
+  <div class="form-page">
+    <div class="page-header">
+      <div class="step-tag">Step 02 — Buyer Registration</div>
+      <h2 class="page-title">Create Buyer Profile</h2>
+      <p class="page-sub">Saved to Firebase → <code style="color:var(--accent);font-size:.8rem;">buyers/[email]</code></p>
+    </div>
+    <div class="info-box"><span>🔥</span><span>All fields save live to Firebase Realtime Database on submission.</span></div>
+    <div class="form-row">
+      <div class="form-group"><label>Full Name <span class="req">*</span></label><input type="text" id="buyerName" placeholder="Priya Venkatesh"></div>
+      <div class="form-group"><label>Organisation <span class="req">*</span></label><input type="text" id="buyerOrg" placeholder="GreenMetal Recyclers Pvt Ltd"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Email <span class="req">*</span></label><input type="email" id="buyerEmail" placeholder="priya@greenmetal.in"></div>
+      <div class="form-group"><label>Phone <span class="req">*</span></label><input type="tel" id="buyerPhone" placeholder="+91 98765 43210"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Alternate Contact <span class="req">*</span></label><input type="tel" id="buyerAlt" placeholder="+91 91234 56789"></div>
+      <div class="form-group"><label>GST / PAN <span class="req">*</span></label><input type="text" id="buyerGst" placeholder="33BBGPV9812R1ZK"></div>
+    </div>
+    <div class="form-group"><label>Business Address <span class="req">*</span></label><input type="text" id="buyerAddr" placeholder="No. 14, Anna Nagar, Chennai - 600040"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Material Interest <span class="req">*</span></label><select id="buyerMaterial"><option>All Categories</option><option>Metal Scrap</option><option>Plastic Waste</option><option>Textile Off-cuts</option><option>Electronic Waste</option><option>Paper / Cardboard</option></select></div>
+      <div class="form-group"><label>Annual Volume <span class="req">*</span></label><select id="buyerVol"><option>&lt; 10 Tonnes/yr</option><option>10–50 Tonnes/yr</option><option>50–200 Tonnes/yr</option><option>200–1000 Tonnes/yr</option><option>&gt; 1000 Tonnes/yr</option></select></div>
+    </div>
+    <div class="form-group"><label>Intended Use <span class="req">*</span></label><textarea id="buyerUse" placeholder="Remanufacturing, upcycling, energy recovery…" style="min-height:80px;"></textarea></div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goTo('page-role')">← Back</button>
+      <button class="btn-primary" onclick="saveBuyer()">🔥 Register &amp; Enter Dashboard →</button>
+    </div>
+  </div>
+</div>
+ 
+<!-- PAGE 7: BUYER DASHBOARD -->
+<div id="page-buyer-dashboard" class="page">
+  <nav class="top-nav"><div class="nav-logo">ECOLOOP <span>BUYER DASHBOARD</span></div><button class="nav-back" onclick="goTo('page-buyer-register')">← Profile</button></nav>
+  <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+  <div class="dashboard-layout">
+    <div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Available Listings</span><span id="listingCount" style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);">3 MATCHES</span></div>
+        <div class="panel-body">
+          <div class="waste-listing"><div class="listing-img" id="listingImg1">🗃️</div><div class="listing-info"><span class="listing-tag">Metal Scrap</span><div class="listing-name">MS Steel Off-cuts — 2.4MT</div><div class="listing-price">₹18,500 <span>/ Tonne</span></div><div class="listing-geo">📍 Coimbatore, TN · 🕐 2h ago</div><button class="btn-primary" style="margin-top:12px;padding:10px 20px;font-size:.8rem;width:100%;" onclick="loadNegotiation('SteelTech Industries','₹18,500/MT','MS Steel Off-cuts')">Negotiate →</button></div></div>
+          <div class="waste-listing"><div class="listing-img">🧴</div><div class="listing-info"><span class="listing-tag">Plastic Waste</span><div class="listing-name">HDPE Drums — 800 kg</div><div class="listing-price">₹22 <span>/ kg</span></div><div class="listing-geo">📍 Surat, GJ · 🕐 6h ago</div><button class="btn-primary" style="margin-top:12px;padding:10px 20px;font-size:.8rem;width:100%;" onclick="loadNegotiation('Chemex Polymers','₹22/kg','HDPE Drums')">Negotiate →</button></div></div>
+          <div class="waste-listing"><div class="listing-img">🪡</div><div class="listing-info"><span class="listing-tag">Textile Off-cuts</span><div class="listing-name">Cotton Remnants — 1.2MT</div><div class="listing-price">₹9,200 <span>/ Tonne</span></div><div class="listing-geo">📍 Tiruppur, TN · 🕐 1d ago</div><button class="btn-primary" style="margin-top:12px;padding:10px 20px;font-size:.8rem;width:100%;" onclick="loadNegotiation('Textile Corp Ltd','₹9,200/MT','Cotton Remnants')">Negotiate →</button></div></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <div class="panel" style="flex:1;">
+        <div class="panel-header"><span class="panel-title">💬 Negotiation Box</span><span id="negoWith" style="font-size:.75rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">Select a listing</span></div>
+        <div class="nego-box">
+          <div class="nego-messages" id="negoMessages"><div style="text-align:center;color:var(--muted);font-size:.85rem;padding:40px 0;">Select a listing to start negotiating</div></div>
+          <div class="nego-input-row"><input type="text" id="negoInput" placeholder="Type your offer or message…" onkeydown="if(event.key==='Enter')sendNegoMsg()"><button class="send-btn" onclick="sendNegoMsg()">↑</button></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">My Sourcing Activity</span></div>
+        <div class="panel-body" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;text-align:center;">
+          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--accent);">3</div><div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;">Active Chats</div></div>
+          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--amber);">1</div><div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;">Pending</div></div>
+          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--blue);">0</div><div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;">Completed</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<!-- PAGE 8: INDUSTRY DASHBOARD -->
+<div id="page-industry-dashboard" class="page">
+  <nav class="top-nav"><div class="nav-logo">ECOLOOP <span>INDUSTRY DASHBOARD</span></div><button class="nav-back" onclick="goTo('page-waste-analysis')">← Listings</button></nav>
+  <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+  <div class="ind-dash">
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-label">Total Listings</div><div class="kpi-value">04</div><div class="kpi-sub">↑ 1 this week</div></div>
+      <div class="kpi"><div class="kpi-label">Revenue Recovered</div><div class="kpi-value" style="font-size:28px;">₹2.3L</div><div class="kpi-sub">via EcoLoop</div></div>
+      <div class="kpi"><div class="kpi-label">Tonnes Diverted</div><div class="kpi-value">18.4</div><div class="kpi-sub">from landfill</div></div>
+      <div class="kpi"><div class="kpi-label">CO₂ Saved</div><div class="kpi-value">9.2T</div><div class="kpi-sub">carbon equivalent</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Data Relationships</span></div>
+        <div class="panel-body">
+          <div class="rel-graph">
+            <div class="rel-node n1">♻️ RecycloTech</div><div class="rel-node n2">🤝 GreenMetal Co.</div>
+            <div class="rel-node n3">📦 EcoFab Pvt Ltd</div><div class="rel-node n4">🏗️ BuildLoop</div>
+            <div class="rel-node n5">🔬 ChemReuse</div><div class="rel-node n6">🌿 BioConvert</div>
+            <div class="rel-center">🏭 Your Industry</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">My Waste Listings</span><button class="btn-primary" style="padding:8px 16px;font-size:.75rem;" onclick="goTo('page-waste-upload')">+ New</button></div>
+        <div class="panel-body" style="padding:0;">
+          <table class="data-table"><thead><tr><th>Material</th><th>Qty</th><th>Price</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>MS Steel Off-cuts</td><td>2.4 MT</td><td>₹18,500</td><td><span class="status-badge active">Active</span></td></tr>
+            <tr><td>Aluminium Shavings</td><td>480 kg</td><td>₹85/kg</td><td><span class="status-badge pending">Pending</span></td></tr>
+            <tr><td>Coolant Sludge</td><td>200 L</td><td>₹4/L</td><td><span class="status-badge active">Active</span></td></tr>
+            <tr><td>Rubber Off-cuts</td><td>1.1 MT</td><td>₹6,500</td><td><span class="status-badge sold">Sold</span></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Incoming Negotiations</span></div>
+        <div class="panel-body" style="padding:0;">
+          <table class="data-table"><thead><tr><th>Buyer</th><th>Material</th><th>Offer</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>GreenMetal Co.</td><td>MS Steel Off-cuts</td><td>₹17,800</td><td><button class="btn-primary" style="padding:6px 14px;font-size:.72rem;">Reply</button></td></tr>
+            <tr><td>EcoFab Pvt Ltd</td><td>Coolant Sludge</td><td>₹3.5/L</td><td><button class="btn-primary" style="padding:6px 14px;font-size:.72rem;">Reply</button></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Circular Impact Score</span></div>
+        <div class="panel-body">
+          <div style="text-align:center;margin-bottom:20px;"><div style="font-family:'Bebas Neue',sans-serif;font-size:72px;color:var(--accent);line-height:1;">84</div><div style="font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">/ 100 EcoScore</div></div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:4px;"><span style="color:var(--label);">Recycle Rate</span><span style="color:var(--accent);">76%</span></div><div class="risk-bar-wrap"><div style="height:100%;width:76%;background:var(--accent);border-radius:4px;"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:4px;"><span style="color:var(--label);">Landfill Diversion</span><span style="color:var(--accent);">91%</span></div><div class="risk-bar-wrap"><div style="height:100%;width:91%;background:var(--accent);border-radius:4px;"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:4px;"><span style="color:var(--label);">Compliance Score</span><span style="color:var(--amber);">68%</span></div><div class="risk-bar-wrap"><div style="height:100%;width:68%;background:var(--amber);border-radius:4px;"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<div class="toast" id="toast"></div>
+ 
+<script>
+function goTo(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function selectRole(role,el){document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');setTimeout(()=>goTo(role==='industry'?'page-industry-verify':'page-buyer-register'),300);}
+function toggleChip(el){el.classList.toggle('active');}
+function handleImageUpload(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    document.getElementById('previewImg').src=ev.target.result;
+    document.getElementById('uploadPreview').style.display='block';
+    const li=document.getElementById('listingImg1');
+    li.textContent='';li.style.backgroundImage=`url(${ev.target.result})`;li.style.backgroundSize='cover';li.style.backgroundPosition='center';
+  };reader.readAsDataURL(file);
+  const now=new Date();window._geoTime=now.toLocaleString('en-IN');
+  document.getElementById('geoBadge').style.display='inline-flex';
+  document.getElementById('geoTime').textContent=window._geoTime;
+  document.getElementById('geoText').textContent='Fetching GPS…';
+  if(navigator.geolocation){navigator.geolocation.getCurrentPosition(pos=>{window._geoLat=pos.coords.latitude.toFixed(5);window._geoLon=pos.coords.longitude.toFixed(5);document.getElementById('geoText').textContent=`${window._geoLat}°N, ${window._geoLon}°E`;},()=>{window._geoLat='11.00765';window._geoLon='77.01034';document.getElementById('geoText').textContent='11.00765°N, 77.01034°E (demo)';});}
+  else{document.getElementById('geoText').textContent='11.00765°N, 77.01034°E (demo)';}
+}
+let negoCompany='',negoMaterial='';
+function loadNegotiation(company,price,material){
+  negoCompany=company;negoMaterial=material;
+  document.getElementById('negoWith').textContent=company.toUpperCase();
+  const box=document.getElementById('negoMessages');
+  box.innerHTML=`<div class="msg industry"><div class="msg-sender">${company}</div>Hello! We have ${material} at ${price}. Interested in bulk deals?</div><div class="msg buyer"><div class="msg-sender">You (Buyer)</div>Hi, can you offer a better rate for 500kg minimum?</div><div class="msg industry"><div class="msg-sender">${company}</div>For 500kg+, we offer 5% discount. Grade A quality, ready for pickup.</div>`;
+  box.scrollTop=box.scrollHeight;
+}
+function sendNegoMsg(){
+  const input=document.getElementById('negoInput');const text=input.value.trim();
+  if(!text||!negoCompany){showToast('⚠️ Select a listing first');return;}
+  const box=document.getElementById('negoMessages');
+  const m=document.createElement('div');m.className='msg buyer';m.innerHTML=`<div class="msg-sender">You (Buyer)</div>${text}`;
+  box.appendChild(m);input.value='';box.scrollTop=box.scrollHeight;
+  if(window.saveNegoMessage)window.saveNegoMessage('buyer',text,negoCompany,negoMaterial);
+  const replies=['Thanks! Let me check with logistics.','That works. Shall we proceed with paperwork?','Pickup in 3 business days — confirmed.','Please share your GST for invoicing.'];
+  setTimeout(()=>{const ind=document.createElement('div');ind.className='msg industry';ind.innerHTML=`<div class="msg-sender">${negoCompany}</div>${replies[Math.floor(Math.random()*replies.length)]}`;box.appendChild(ind);box.scrollTop=box.scrollHeight;if(window.saveNegoMessage)window.saveNegoMessage('industry',ind.querySelector('div+*')?ind.textContent:'',negoCompany,negoMaterial);},1200);
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+</script>
+</body>
+</html> 
+  
