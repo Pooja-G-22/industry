@@ -1,45 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Pooja AI Website</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoLoop ISEP-5 | Intelligent Supplier Economic Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
-    <header>
-        <h1>Pooja's AI Project</h1>
-        <p>Created using AI & customized by me</p>
-    </header>
+<!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-    <section class="hero">
-        <img src="images/sample.jpg" alt="AI Image">
-        <h2>Welcome to My Website</h2>
-        <button onclick="showMessage()">Click Me</button>
-    </section>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDt0Ov08xaYN69xU1sDOObaHy8bJGvqt_g",
+    authDomain: "ecoloop-67fce.firebaseapp.com",
+    databaseURL: "https://ecoloop-67fce-default-rtdb.firebaseio.com",
+    projectId: "ecoloop-67fce",
+    storageBucket: "ecoloop-67fce.firebasestorage.app",
+    messagingSenderId: "50320708460",
+    appId: "1:50320708460:web:3f2b6d2ea475250b83d949"
+  };
 
-    <section class="about">
-        <h2>About This Project</h2>
-        <p>
-            This website is created using AI tools and modified by me. 
-            It demonstrates web development skills using HTML, CSS, and JavaScript.
-        </p>
-    </section>
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
 
-    <section class="features">
-        <h2>Features</h2>
-        <ul>
-            <li>Responsive Design</li>
-            <li>Interactive Button</li>
-            <li>Clean UI</li>
-            <li>GitHub Hosting</li>
-        </ul>
-    </section>
+  // Save Industry Verification → Firebase: industries/[GSTIN]
+  window.saveIndustryVerification = async function() {
+    const tin = document.getElementById('tin').value.trim();
+    const gst = document.getElementById('gst').value.trim();
+    const name = document.getElementById('companyName').value.trim();
+    const sector = document.getElementById('sector').value;
+    const state = document.getElementById('state').value;
+    const contact = document.getElementById('contactPerson').value.trim();
+    if (!tin || !gst || !name || !sector || !state || !contact) { showToast('⚠️ Please fill all required fields'); return; }
+    try {
+      showToast('⏳ Saving to Firebase…');
+      await set(ref(db, 'industries/' + gst), { tin, gst, companyName: name, sector, state, contactPerson: contact, registeredAt: new Date().toISOString() });
+      window._currentIndustryGST = gst;
+      window._currentIndustryName = name;
+      showToast('✅ Industry verified & saved!');
+      setTimeout(() => goTo('page-waste-upload'), 800);
+    } catch(e) { showToast('❌ ' + e.message); }
+  };
 
-    <footer>
-        <p>© 2026 Pooja | AI Student</p>
-    </footer>
+  // Save Waste Listing → Firebase: wasteListing/[auto-id]
+  window.saveWasteListing = async function() {
+    const qty = document.getElementById('quantity').value.trim();
+    const price = document.getElementById('price').value.trim();
+    const desc = document.getElementById('wasteDesc').value.trim();
+    if (!qty || !price || !desc) { showToast('⚠️ Please fill all required fields'); return; }
+    const chips = [...document.querySelectorAll('.waste-chip.active')].map(c => c.textContent);
+    try {
+      showToast('⏳ Saving listing…');
+      const newRef = await push(ref(db, 'wasteListing'), {
+        industryGST: window._currentIndustryGST || 'DEMO',
+        industryName: window._currentIndustryName || 'Demo Industry',
+        wasteTypes: chips, quantity: qty,
+        unit: document.getElementById('unit').value,
+        pricePerUnit: price, currency: 'INR',
+        disposalMethod: document.getElementById('disposal').value,
+        description: desc,
+        pickupAddress: document.getElementById('pickupAddr').value,
+        buyerQuery: document.getElementById('buyerQuery').value,
+        geoLat: window._geoLat || null, geoLon: window._geoLon || null,
+        geoTimestamp: window._geoTime || null,
+        listedAt: new Date().toISOString(), status: 'active'
+      });
+      window._currentListingId = newRef.key;
+      showToast('✅ Waste listing saved!');
+      setTimeout(() => goTo('page-waste-analysis'), 800);
+    } catch(e) { showToast('❌ ' + e.message); }
+  };
 
-    <script src="script.js"></script>
-</body>
-</html>
+  // Save Analysis → Firebase: wasteAnalysis/[auto-id]
+  window.saveAnalysis = async function() {
+    try {
+      showToast('⏳ Submitting analysis…');
+      await push(ref(db, 'wasteAnalysis'), {
+        listingId: window._currentListingId || 'DEMO',
+        recyclePercent: document.getElementById('pctRecycle').textContent,
+        reusePercent: document.getElementById('pctReuse').textContent,
+        demolishPercent: document.getElementById('pctDemolish').textContent,
+        recycleMethod: document.getElementById('recycleMethod').value,
+        reuseMethod: document.getElementById('reuseMethod').value,
+        pollutionRisk: document.getElementById('riskPct').textContent,
+        analysedAt: new Date().toISOString()
+      });
+      showToast('✅ Listing submitted!');
+      setTimeout(() => goTo('page-industry-dashboard'), 800);
+    } catch(e) { showToast('❌ ' + e.message); }
+  };
+
+  // Save Buyer → Firebase: buyers/[email]
+  window.saveBuyer = async function() {
+    const name = document.getElementById('buyerName').value.trim();
+    const org = document.getElementById('buyerOrg').value.trim();
+    const email = document.getElementById('buyerEmail').value.trim();
+    const phone = document.getElementById('buyerPhone').value.trim();
+    const alt = document.getElementById('buyerAlt').value.trim();
+    const gst = document.getElementById('buyerGst').value.trim();
+    const addr = document.getElementById('buyerAddr').value.trim();
+    if (!name || !org || !email || !phone || !alt || !gst || !addr) { showToast('⚠️ Please fill all required fields'); return; }
+    try {
+      showToast('⏳ Registering buyer…');
+      const key = email.replace(/\./g,'_').replace(/@/g,'_at_');
+      await set(ref(db, 'buyers/' + key), {
+        fullName: name, organisation: org, email, phone,
+        alternateContact: alt, gstOrPan: gst, address: addr,
+        materialInterest: document.getElementById('buyerMaterial').value,
+        annualVolume: document.getElementById('buyerVol').value,
+        registeredAt: new Date().toISOString()
+      });
+      window._currentBuyerName = name;
+      window._currentBuyerOrg = org;
+      showToast('✅ Buyer registered!');
+      setTimeout(() => goTo('page-buyer-dashboard'), 800);
+    } catch(e) { showToast('❌ ' + e.message); }
+  };
+
+  // Save Negotiation Message → Firebase: negotiations/[auto-id]
+  window.saveNegoMessage = async function(sender, message, company, material) {
+    try {
+      await push(ref(db, 'negotiations'), {
+        sender, message, company, material,
+        buyerName: window._currentBuyerName || 'Buyer',
+        timestamp: new Date().toISOString()
+      });
+    } catch(e) { console.warn('Nego save:', e.message); }
+  };
+
+  // Load listing count from DB
+  onValue(ref(db, 'wasteListing'), (snap) => {
+    const data = snap.val();
+    const el = document.getElementById('listingCount');
+    if (el && data) el.textContent = Object.keys(data).length + ' MATCHES';
+  });
+</script>
+
+<style>
+  :root {
+    --bg:#0a0f0a;--surface:#111811;--surface2:#172017;--border:#2a3d2a;
+    --accent:#4ade80;--accent2:#86efac;--amber:#f59e0b;--red:#ef4444;--blue:#60a5fa;
+    --text:#e8f5e8;--muted:#6b8f6b;--label:#a3c4a3;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+  .page{display:none;min-height:100vh;}
+  .page.active{display:flex;flex-direction:column;animation:fadeIn .4s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+  #page-hero{background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(74,222,128,.12) 0%,transparent 70%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(245,158,11,.06) 0%,transparent 60%),var(--bg);align-items:center;justify-content:center;text-align:center;padding:60px 24px;position:relative;overflow:hidden;}
+  .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(74,222,128,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(74,222,128,.04) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;}
+  .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:999px;padding:6px 18px;font-size:.72rem;font-family:'JetBrains Mono',monospace;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:32px;}
+  .hero-badge span{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+  .hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,9vw,120px);line-height:.92;background:linear-gradient(135deg,#fff 0%,var(--accent2) 50%,var(--accent) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;}
+  .hero-subtitle{font-size:clamp(12px,2vw,16px);color:var(--muted);letter-spacing:.18em;text-transform:uppercase;margin-bottom:28px;font-family:'JetBrains Mono',monospace;}
+  .hero-slogan{font-size:clamp(18px,3vw,26px);font-weight:300;color:var(--label);max-width:620px;margin:0 auto 48px;line-height:1.5;}
+  .hero-slogan strong{color:var(--accent);font-weight:600;}
+  .hero-stats{display:flex;gap:48px;justify-content:center;margin-bottom:56px;flex-wrap:wrap;}
+  .stat{text-align:center;}.stat-num{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--accent);line-height:1;}
+  .stat-label{font-size:.72rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:4px;}
+  .db-status{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--accent);background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:999px;padding:4px 12px;margin-top:14px;}
+  .db-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
+
+  .btn-primary{display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:#0a0f0a;border:none;border-radius:6px;padding:16px 40px;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+  .btn-primary:hover{background:var(--accent2);transform:translateY(-2px);box-shadow:0 12px 40px rgba(74,222,128,.3);}
+  .btn-secondary{display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid var(--border);border-radius:6px;padding:13px 28px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;}
+  .btn-secondary:hover{border-color:var(--muted);color:var(--text);}
+
+  #page-role{align-items:center;justify-content:center;padding:60px 24px;background:var(--bg);}
+  .role-cards{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;margin-top:48px;}
+  .role-card{width:280px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px 32px;cursor:pointer;transition:all .3s;text-align:center;position:relative;overflow:hidden;}
+  .role-card:hover{border-color:var(--accent);transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,.4);}
+  .role-card.selected{border-color:var(--accent);background:rgba(74,222,128,.06);}
+  .role-icon{font-size:52px;margin-bottom:20px;display:block;}
+  .role-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.06em;color:var(--accent);margin-bottom:8px;}
+  .role-desc{font-size:.85rem;color:var(--muted);line-height:1.6;}
+
+  .form-page{max-width:720px;margin:0 auto;padding:60px 24px;width:100%;}
+  .page-header{margin-bottom:40px;}
+  .step-tag{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--accent);letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .step-tag::after{content:'';flex:1;height:1px;background:var(--border);}
+  .page-title{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:.04em;line-height:1;}
+  .page-sub{color:var(--muted);font-size:.9rem;margin-top:8px;}
+  .form-group{margin-bottom:24px;}
+  label{display:block;font-size:.8rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--label);margin-bottom:8px;}
+  label .req{color:var(--accent);margin-left:2px;}
+  input[type="text"],input[type="number"],input[type="email"],input[type="tel"],select,textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:.95rem;transition:border-color .2s,box-shadow .2s;outline:none;}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,222,128,.12);}
+  select option{background:#111811;}textarea{resize:vertical;min-height:100px;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media(max-width:520px){.form-row{grid-template-columns:1fr;}}
+  .btn-row{display:flex;gap:12px;justify-content:space-between;margin-top:32px;flex-wrap:wrap;}
+  .divider{height:1px;background:var(--border);margin:32px 0;}
+  .info-box{background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.15);border-radius:10px;padding:16px 20px;font-size:.85rem;color:var(--label);margin-bottom:24px;display:flex;align-items:flex-start;gap:10px;}
+
+  .upload-box{border:2px dashed var(--border);border-radius:12px;padding:48px 24px;text-align:center;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;background:var(--surface);}
+  .upload-box:hover{border-color:var(--accent);background:rgba(74,222,128,.03);}
+  .upload-box input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+  .upload-icon{font-size:40px;margin-bottom:12px;}.upload-title{font-weight:600;color:var(--text);margin-bottom:6px;}
+  .upload-hint{font-size:.82rem;color:var(--muted);}
+  .upload-preview{display:none;margin-top:16px;}.upload-preview img{max-width:100%;max-height:200px;border-radius:8px;border:1px solid var(--border);}
+  .geo-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:6px;padding:8px 16px;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent);margin-top:12px;}
+  .waste-types{display:flex;flex-wrap:wrap;gap:8px;}
+  .waste-chip{padding:8px 16px;border:1px solid var(--border);border-radius:999px;font-size:.82rem;cursor:pointer;transition:all .2s;background:var(--surface);}
+  .waste-chip:hover,.waste-chip.active{border-color:var(--accent);color:var(--accent);background:rgba(74,222,128,.08);}
+
+  .analysis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px;}
+  @media(max-width:520px){.analysis-grid{grid-template-columns:1fr;}}
+  .analysis-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;}
+  .analysis-card.green{border-color:rgba(74,222,128,.3);}.analysis-card.amber{border-color:rgba(245,158,11,.3);}.analysis-card.red{border-color:rgba(239,68,68,.3);}
+  .analysis-pct{font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1;}
+  .green .analysis-pct{color:var(--accent);}.amber .analysis-pct{color:var(--amber);}.red .analysis-pct{color:var(--red);}
+  .analysis-label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:6px;}
+  .analysis-bar{height:4px;border-radius:2px;margin-top:12px;}
+  .green .analysis-bar{background:var(--accent);}.amber .analysis-bar{background:var(--amber);}.red .analysis-bar{background:var(--red);}
+  .env-risk{margin-top:20px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
+  .env-risk-label{font-size:.8rem;color:var(--label);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;font-weight:600;}
+  .risk-bar-wrap{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;}
+  .risk-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--amber),var(--red));transition:width .5s ease;}
+
+  .top-nav{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--border);background:rgba(10,15,10,.8);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;}
+  .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;color:var(--accent);}
+  .nav-logo span{color:var(--muted);font-size:11px;font-family:'JetBrains Mono',monospace;display:block;letter-spacing:.12em;}
+  .nav-back{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 16px;font-size:.82rem;color:var(--muted);cursor:pointer;transition:all .2s;}
+  .nav-back:hover{border-color:var(--accent);color:var(--accent);}
+  .progress-bar{height:2px;background:var(--surface2);}
+  .progress-fill{height:100%;background:var(--accent);transition:width .4s ease;}
+
+  .dashboard-layout{display:grid;grid-template-columns:300px 1fr;gap:24px;padding:32px 24px;max-width:1200px;margin:0 auto;width:100%;}
+  @media(max-width:768px){.dashboard-layout{grid-template-columns:1fr;}}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+  .panel-header{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .panel-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:var(--accent);}
+  .panel-body{padding:20px;}
+  .waste-listing{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px;}
+  .listing-img{width:100%;height:160px;object-fit:cover;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:48px;}
+  .listing-info{padding:14px;}
+  .listing-tag{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;background:rgba(74,222,128,.08);padding:3px 8px;border-radius:4px;display:inline-block;margin-bottom:8px;}
+  .listing-name{font-weight:600;font-size:1rem;margin-bottom:4px;}
+  .listing-price{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--accent);}
+  .listing-price span{font-family:'Space Grotesk',sans-serif;font-size:.75rem;color:var(--muted);font-weight:400;}
+  .listing-geo{font-size:.75rem;color:var(--muted);margin-top:4px;}
+  .nego-box{display:flex;flex-direction:column;}
+  .nego-messages{overflow-y:auto;padding:16px;max-height:320px;display:flex;flex-direction:column;gap:12px;}
+  .msg{max-width:78%;padding:10px 14px;border-radius:10px;font-size:.875rem;line-height:1.5;}
+  .msg.buyer{align-self:flex-end;background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.2);}
+  .msg.industry{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);}
+  .msg-sender{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;font-weight:600;}
+  .nego-input-row{display:flex;gap:8px;padding:14px 16px;border-top:1px solid var(--border);}
+  .nego-input-row input{flex:1;border-radius:999px;padding:10px 18px;}
+  .send-btn{background:var(--accent);color:#0a0f0a;border:none;border-radius:999px;width:40px;height:40px;font-size:16px;cursor:pointer;transition:all .2s;flex-shrink:0;}
+  .send-btn:hover{background:var(--accent2);}
+
+  .ind-dash{max-width:1100px;margin:0 auto;padding:32px 24px;width:100%;}
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+  @media(max-width:700px){.kpi-row{grid-template-columns:repeat(2,1fr);}}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
+  .kpi-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+  .kpi-value{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--accent);line-height:1;}
+  .kpi-sub{font-size:.75rem;color:var(--muted);margin-top:4px;}
+  .data-table{width:100%;border-collapse:collapse;}
+  .data-table th{text-align:left;font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:10px 14px;border-bott
